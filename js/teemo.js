@@ -1,0 +1,147 @@
+/*
+	* Teemo 1.0
+	*/
+
+	//格式化数据
+	this.Teemo = this.Teemo||{},
+	function (){
+		var self = self||{};
+
+		// 支持下载的类型
+		self.allType = {
+			image:['png','jpg'],
+			json:['json'],
+			audio:['mp3']
+		};
+
+		//获取该文件的类型
+		self.getType = function(u){
+
+			var _type = (u.match(/[^\.]+$/)[0]);
+
+			for (key in self.allType) {
+				if(self.allType[key].join(',').indexOf(_type) !== -1){
+
+					_type = key;
+					break;
+
+				}else{
+
+					_type = 'nonsupport';
+				
+				}
+			}
+			return _type;
+		}
+
+		//格式化数据
+		self.setData = function(data){
+
+			var _data = [];
+
+			data.forEach(function(e,i,o){
+
+				var _url = e.url||e,
+				 	_type = self.getType(_url),
+				 	_callback = e.callback||null;
+
+				_data.push({
+						url:_url,
+						type:_type,
+						callback:_callback
+					});	
+
+			});
+			Teemo.data = _data;
+		};
+
+		Teemo.self = self;
+
+	}(),
+
+	//下载器
+	this.Teemo = this.Teemo||{},
+	function (){
+		var load = load||{};
+		//支持的事件类型
+		load.events = {
+				start:null,
+				loading:null,
+				complete:null,
+				error:null
+			};
+
+		load.on = function(t,c){
+			load.events[t] = c;
+		};
+		load.off = function(t){
+			load.events[t] = null;
+		};
+		load.start = function(d){
+
+			var _d = d||Teemo.data;
+			load.nowProgress = 0;
+			load.allProgress = _d.length;
+			load.runEvent('start');
+			_d.forEach(function(e,i,o){
+
+				e.type !== 'nonsupport'&&load["_"+e.type](e);
+
+			});
+
+		};
+		load.runEvent = function(k){
+
+			switch (k)
+			{
+				case 'start':
+				load.events.start&&load.start();
+				break;
+
+				case 'loading':
+				load.events.loading&&load.events.loading({nowProgress:load.nowProgress,allProgress:load.allProgress});
+				break;
+
+				case 'complete':
+				load.events.complete&&load.nowProgress === load.allProgress&&load.events.complete();
+				break;
+
+				case 'error':
+				load.events.error&&load.events.error();
+				break;
+			}
+		
+
+
+		};
+		load._image = function(o){
+
+			var i = new Image();
+			i.src = o.url;
+			i.onload = function(e){
+
+				o.callback&&o.callback(e);
+				load.nowProgress++;
+				load.runEvent('loading');
+				load.runEvent('complete');
+			};
+			i.error = function(e){
+
+				console.info('url:'+i.src+' error!');
+				load.runEvent('error');
+			}
+		};
+		load._json = function(o){
+			//未加入
+
+
+		};
+		load._audio = function(o){
+			//未加入
+			
+
+		};
+
+		Teemo.load = load;
+
+	}();

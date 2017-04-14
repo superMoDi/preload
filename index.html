@@ -1,0 +1,55 @@
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Teemo-proload-1.0</title>
+	</head>
+	<body>
+	</body>
+	<script src="js/teemo.js"></script>
+	<script>
+
+		var data = [
+			'img/1.jpg',
+			'img/2.jpg',
+			'img/3.jpg',
+			'img/4.jpg',
+			'img/5.jpg',
+			'img/6.jpg',
+			'img/7.jpg',
+			'img/8.jpg',
+			'img/9.jpg',
+			'img/10.jpg',
+			'img/11.jpg',
+			'img/12.jpg',
+			'img/13.jpg',
+			'img/14.jpg',
+			{url:'img/15.jpg',callback:function(e){console.log('n:15 ready')}}
+		];
+
+		//注入数据
+		Teemo.self.setData(data);	
+
+		//开始加载
+		Teemo.load.start();  
+
+
+		//监听加载中事件
+		Teemo.load.on('loading',function(e){
+			console.log(e.nowProgress,e.allProgress);
+		});
+
+
+		//监听加载完成
+		Teemo.load.on('complete',function(e){
+			console.log('the source is ready');
+		});
+
+
+		//监听错误加载事件
+		Teemo.load.on('error',function(e){
+			console.log(e);
+		});
+
+	</script>
+
+</html>
